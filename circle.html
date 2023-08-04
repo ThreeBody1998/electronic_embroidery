@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>绘制圆</title>
+    <script type="text/javascript" src="draw.js"></script>
+</head>
+<body>
+    <!-- <input type="file" id="fileInput">
+    <button onclick="convertToGrayscale()" >灰度处理</button>
+    <br>
+    <img id="preview" src="#" alt="预览图片" style="max-width: 300px; max-height: 300px;">
+    <div id="result"></div> -->
+    <canvas id="myCanvas" width="800" height="800"></canvas>
+    
+    
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d');
+        var array=new Array;
+        //画圆
+        //圆的参数
+        var centerX = 300;
+        var centerY = 300;
+        var radius = 200;
+        //调用绘制函数
+        drawCircle(context,centerX,centerY,radius);
+        //在圆上均等画上100个点，每个点的半径为3
+        //点的所需参数
+        var dotSize=100;
+        var dotRadius=3;
+        //调用画点函数
+        drawDotInCircle(context,centerX,centerY,dotSize,dotRadius,array);
+        //连接圆上的线
+        drawLine(context,0,50);
+    </script>
+
+    <!-- <script>
+        // 获取文件选择输入框和图片预览元素
+        var fileInput = document.getElementById('fileInput');
+        var preview = document.getElementById('preview');
+        var resultDiv = document.getElementById('result');
+        // 监听文件选择框的change事件
+        fileInput.addEventListener('change', function () {
+            var file = fileInput.files[0]; // 获取用户选择的文件
+
+            // 检查文件类型是否为PNG
+            if (file.type.match('image/png')) {
+                // 使用FileReader读取文件内容，并将读取到的内容设置为图片预览的src
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('请上传PNG文件！');
+            }
+        });
+        // 灰度处理函数
+        function convertToGrayscale() {
+            // 创建一个Canvas元素
+            var canvas = document.createElement('canvas');
+            canvas.width = preview.width;
+            canvas.height = preview.height;
+
+            // 在Canvas上绘制图片
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(preview, 0, 0, preview.width, preview.height);
+
+            // 获取图像数据
+            var imageData = ctx.getImageData(0, 0, preview.width, preview.height);
+            var data = imageData.data;
+
+            // 对图像数据进行灰度处理
+            for (var i = 0; i < data.length; i += 4) {
+                var r = data[i];
+                var g = data[i + 1];
+                var b = data[i + 2];
+                var gray = 0.299 * r + 0.587 * g + 0.114 * b; // 根据灰度处理公式计算灰度值
+                data[i] = data[i + 1] = data[i + 2] = gray; // 将RGB值设置为灰度值
+            }
+
+            // 将处理后的图像数据重新放回Canvas
+            ctx.putImageData(imageData, 0, 0);
+
+            // 将处理后的Canvas转换为Data URL并显示在页面上
+            var grayscaleImg = new Image();
+            grayscaleImg.src = canvas.toDataURL();
+
+            // 在页面上显示灰度处理后的图片
+            resultDiv.innerHTML = '';
+            resultDiv.appendChild(grayscaleImg);
+
+            // 获取灰度值（平均灰度值）
+            var totalGray = 0;
+            for (var j = 0; j < data.length; j += 4) {
+                totalGray += data[j];
+            }
+            var averageGray = totalGray / (data.length / 4);
+            console.log('平均灰度值:', averageGray);
+        }
+    </script> -->
+</body>
+</html>
