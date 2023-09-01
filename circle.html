@@ -3,20 +3,51 @@
 <head>
     <title>绘制圆</title>
     <script type="text/javascript" src="draw.js"></script>
+    <link rel="stylesheet" href="draw.css">
 </head>
 <body>
-    <!-- <input type="file" id="fileInput">
-    <button onclick="convertToGrayscale()" >灰度处理</button>
-    <br>
-    <img id="preview" src="#" alt="预览图片" style="max-width: 300px; max-height: 300px;">
-    <div id="result"></div> -->
+    <div class="first-row">
+        <div class="button-group file-upload">
+            <h3>文件上传区域</h3>
+            <div>
+                <input type="file" id="fileInput">
+            </div>
+            <img id="preview" style="width: 400px;height: 400px;"></img>
+        </div>
+        <div class="button-group">
+            <h3>灰度处理区域</h3>
+            <button onclick="greyProcess()">灰度处理</button>
+            <div id="greyProcessDiv">
+
+            </div>
+        </div>
+        <div class="button-group">
+            <h3>栅格化处理区域</h3>
+            <button onclick="gridProcess()">栅格化处理</button>
+            栅格大小
+            <input type="range" id="gridProgress" min="5" max="100" value="5" step="5" onchange="updateProgress(this.value)">
+            <div id="gridProcessDiv"></div>
+
+        </div>
+    </div>
+    <div class="second-row">
+        <canvas id="canvas" width="800" height="400"></canvas>
+    </div>
     <canvas id="myCanvas" width="800" height="800"></canvas>
     
     
     <script>
+        //初始化
         const canvas = document.getElementById('myCanvas');
         const context = canvas.getContext('2d');
         var array=new Array;
+        //监听文件提交
+        listenImgUpload();
+        //栅格化参数
+        //栅格步长
+        var gridStep=10;
+        //栅格灰度区间值
+        var gridGreyValueLimit=50;
         //画圆
         //圆的参数
         var centerX = 300;
@@ -34,70 +65,5 @@
         drawLine(context,0,50);
     </script>
 
-    <!-- <script>
-        // 获取文件选择输入框和图片预览元素
-        var fileInput = document.getElementById('fileInput');
-        var preview = document.getElementById('preview');
-        var resultDiv = document.getElementById('result');
-        // 监听文件选择框的change事件
-        fileInput.addEventListener('change', function () {
-            var file = fileInput.files[0]; // 获取用户选择的文件
-
-            // 检查文件类型是否为PNG
-            if (file.type.match('image/png')) {
-                // 使用FileReader读取文件内容，并将读取到的内容设置为图片预览的src
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            } else {
-                alert('请上传PNG文件！');
-            }
-        });
-        // 灰度处理函数
-        function convertToGrayscale() {
-            // 创建一个Canvas元素
-            var canvas = document.createElement('canvas');
-            canvas.width = preview.width;
-            canvas.height = preview.height;
-
-            // 在Canvas上绘制图片
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(preview, 0, 0, preview.width, preview.height);
-
-            // 获取图像数据
-            var imageData = ctx.getImageData(0, 0, preview.width, preview.height);
-            var data = imageData.data;
-
-            // 对图像数据进行灰度处理
-            for (var i = 0; i < data.length; i += 4) {
-                var r = data[i];
-                var g = data[i + 1];
-                var b = data[i + 2];
-                var gray = 0.299 * r + 0.587 * g + 0.114 * b; // 根据灰度处理公式计算灰度值
-                data[i] = data[i + 1] = data[i + 2] = gray; // 将RGB值设置为灰度值
-            }
-
-            // 将处理后的图像数据重新放回Canvas
-            ctx.putImageData(imageData, 0, 0);
-
-            // 将处理后的Canvas转换为Data URL并显示在页面上
-            var grayscaleImg = new Image();
-            grayscaleImg.src = canvas.toDataURL();
-
-            // 在页面上显示灰度处理后的图片
-            resultDiv.innerHTML = '';
-            resultDiv.appendChild(grayscaleImg);
-
-            // 获取灰度值（平均灰度值）
-            var totalGray = 0;
-            for (var j = 0; j < data.length; j += 4) {
-                totalGray += data[j];
-            }
-            var averageGray = totalGray / (data.length / 4);
-            console.log('平均灰度值:', averageGray);
-        }
-    </script> -->
 </body>
 </html>
