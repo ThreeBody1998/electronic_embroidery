@@ -1,3 +1,11 @@
+<!--
+ * @Author: 周建泽 jianzecc@outlook.com
+ * @Date: 2023-08-18 10:46:55
+ * @LastEditors: 周建泽 jianzecc@outlook.com
+ * @LastEditTime: 2024-03-22 16:44:14
+ * @FilePath: /MyProject/electronic_embroidery/circle.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,11 +31,12 @@
         </div>
         <div class="button-group">
             <h3>栅格化处理区域</h3>
+            每条边的大小<input type="text" value="10" id="gridNumber">
             <button onclick="gridProcess()">栅格化处理</button>
-            栅格大小
-            <input type="range" id="gridProgress" min="5" max="100" value="5" step="5" onchange="updateProgress(this.value)">
-            <div id="gridProcessDiv"></div>
-
+            <br>
+            <span id="splitNumber"></span>
+            <div id="gridProcessDiv">
+            </div>
         </div>
     </div>
     <div class="second-row">

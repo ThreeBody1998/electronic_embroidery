@@ -1,4 +1,14 @@
+//灰色处理后的图片数据
 var imgGridDataArray=new Array;
+//正方形图片的每行的像素数量
+var imgWidth;
+//栅格化的步长
+var step;
+//栅格化后的每行的格子数量
+var sideGridNumber;
+//灰度平均矩阵
+var grayMatrix;
+
 //画圆
 function drawCircle(context,centerX,centerY,radius){
     context.beginPath();
@@ -79,77 +89,120 @@ function greyProcess(){
         data[i] = data[i + 1] = data[i + 2] = gray; // 将RGB值设置为灰度值
         imgGridDataArray.push(gray);
     }
-
     // 将处理后的图像数据重新放回Canvas
     ctx.putImageData(imageData, 0, 0);
     // 将处理后的Canvas转换为Data URL并显示在页面上
     var grayScaleImg = new Image();
     grayScaleImg.src = canvas.toDataURL();
-    grayScaleImg.id="gridImg";
+    grayScaleImg.id="greyImg";
     // 在页面上显示灰度处理后的图片
     var greyProcessDiv=document.getElementById('greyProcessDiv');
     greyProcessDiv.innerHTML = '';
     greyProcessDiv.appendChild(grayScaleImg);
-    // 获取灰度值（平均灰度值）
-    // var totalGray = 0;
-    // for (var j = 0; j < data.length; j += 4) {
-    //     totalGray += data[j];
-    // }
-    
-
 }
-
+/**
+ * 栅格处理
+ */
+function gridProcess(){
+    var progressValue=document.getElementById("gridNumber").value;
+    document.getElementById("splitNumber").innerText="切割为"+progressValue+" X "+progressValue+"的栅格("+progressValue*progressValue+")";
+    //根据滑动条的百分比获取对应的图片长度
+    photoSplit2Grid(progressValue);
+}
 //控制栅格大小
 function updateProgress(step){
-    //计算每个栅格的大小
-    //上传图片边长
-    var imgSize=preview.width;
-    //栅格后每个格子的大小
-    var gridSize=imgSize/100*step;
-    //计算单边数量并取整
-    var sigleGridNumber=Math.floor(imgSize/gridSize);
-    //计算栅格后的总格子数量大小，剩余不足步长的按1个计算
-    var gridNumber=Math.pow(imgSize%gridSize==0?sigleGridNumber:sigleGridNumber+1,2);
-    //计算每个格子的平均灰度并填充至数据里面
-    for(var i=0;i<gridNumber;i++){
-        //根据下标获取对应方格子的下标存入数组
-        var partImgDataArray=getImgDataIndexByNumber(i,step,gridNumber);
-        //计算平均灰度值
-        var partAverageGray=calculateAverageByArray(partImgDataArray);
-        //将灰度值填充至对应的区域
-        fillGrayByIndex(partImgDataArray);
+    step=this.step;
+
+    var greyImg=document.getElementById("greyImg");
+    // 创建一个Canvas元素
+    var canvas = document.createElement('canvas');
+    canvas.width = greyImg.width;
+    canvas.height = greyImg.height;
+    // 在Canvas上绘制图片
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(greyImg, 0, 0, greyImg.width, greyImg.height);
+    imgWidth=greyImg.width;
+    // 获取图像数据
+    var imageData = ctx.getImageData(0, 0, greyImg.width, greyImg.height);
+    var data = imageData.data;
+    //数据处理
+    for (var y = 0; y < canvas.height; y += step) {
+        for (var x = 0; x < canvas.width; x += step) {
+            var r = 0,
+                g = 0,
+                b = 0,
+                a = 0;
+            for (var offsetY = 0; offsetY < step; offsetY++) {
+                for (var offsetX = 0; offsetX < step; offsetX++) {
+                    var pixelIndex = ((y + offsetY) * canvas.width + (x + offsetX)) * 4;
+
+                    r += data[pixelIndex];
+                    g += data[pixelIndex + 1];
+                    b += data[pixelIndex + 2];
+                    a += data[pixelIndex + 3];
+                }
+            }
+            var blockSize = step * step;
+            r = Math.round(r / blockSize);
+            g = Math.round(g / blockSize);
+            b = Math.round(b / blockSize);
+            a = Math.round(a / blockSize);
+
+            for (var offsetY = 0; offsetY < step; offsetY++) {
+                for (var offsetX = 0; offsetX < step; offsetX++) {
+                    var pixelIndex = ((y + offsetY) * canvas.width + (x + offsetX)) * 4;
+
+                    data[pixelIndex] = r;
+                    data[pixelIndex + 1] = g;
+                    data[pixelIndex + 2] = b;
+                    data[pixelIndex + 3] = a;
+                }
+            }
+        }
     }
-    //预览区域反显
+    // 将处理后的图像数据重新放回Canvas
+    ctx.putImageData(imageData, 0, 0);
     // 将处理后的Canvas转换为Data URL并显示在页面上
     var gridScaleImg = new Image();
     gridScaleImg.src = canvas.toDataURL();
-    gridScaleImg.id="gridProgressImg";
+    gridScaleImg.id="gridImg";
     // 在页面上显示灰度处理后的图片
     var gridProcessDiv=document.getElementById('gridProcessDiv');
     gridProcessDiv.innerHTML = '';
     gridProcessDiv.appendChild(gridScaleImg);
-    
+}
+/**
+ * 将每块区域的灰度值计算平均值，放到灰度平均矩阵中
+ * @param {划分的格子变长大小} number 
+ */
+function photoSplit2Grid(number){
+    var greyImg=document.getElementById("greyImg");
+    // 创建一个Canvas元素
+    var canvas = document.createElement('canvas');
+    canvas.width = greyImg.width;
+    canvas.height = greyImg.height;
+    // 在Canvas上绘制图片
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(greyImg, 0, 0, greyImg.width, greyImg.height);
+    imgWidth=greyImg.width;
+    // 获取图像数据
+    var imageData = ctx.getImageData(0, 0, greyImg.width, greyImg.height);
+    var data = imageData.data;
+    console.log(data);
+    //将数据根据切割的大小计算每块平均的灰度值
+    for(let i=0;i<number;i++){
+        for(let j=0;j<number;j++){
+            //根据i 和j 的下标获取需要计算的区域
+            //x起始位置
+            var startX=i*imgWidth/number;
+            //x结束为止，结束的区域不能超过最大横坐标
+            var endX=i*imgWidth/number+imgWidth/number;
+            //y起始为止
+            var startY=j*imgWidth/number;
+            //y结束为止，结束的区域不能超过最大纵坐标
+            var endY=j*imgWidth/number+imgWidth/number;
+        }
+    }
 }
 
-/**
- * 根据方格子的下标获取对应的图片数组的下标
- * @param {*} index 开始下标
- * @param {*} step 步长
- * @param {*} totalNumber   总数 
- * @returns 数组
- */
-function getImgDataIndexByNumber(index,step,totalNumber){
-    var returnArray=[];
-    
-    var singleNumber=Math.sqrt(totalNumber);
-    //计算选中的范围内的第一个下标是在第几行第几列
-    var row=index/singleNumber;
-    var col=index-row*singleNumber;
-    //计算开始下标 行数*每行最大数量+列数*步长
-    var startIndex=row*singleNumber+col*step;
-    for(var i=0;i<step*step;i++){
-        returnArray.push(startIndex);
-        
-    }
-    return returnArray;   
-}
+
