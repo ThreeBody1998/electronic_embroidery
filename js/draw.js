@@ -1,35 +1,73 @@
 //正方形图片的每行的像素数量
-var imgWidth;
+let imgWidth;
 //预览的图片
 let preview;
 //栅格化后的图片
-var gridImg;
+let gridImg;
 //图片数据
-var imageData;
+let imageData;
+/**
+ * 点的X坐标
+ * @type {number}
+ */
+let centerX;
+/**
+ * 点的Y坐标
+ * @type {number}
+ */
+let centerY;
+/**
+ * 半径
+ * @type {number}
+ */
+const radius = 200;
+/**
+ * 圆上所绘制的点的半径
+ * @type {number}
+ */
+const dotRadius=3;
+/**
+ * 点的数组
+ * @type {*[]}
+ */
+let pointArray = [];
 
-//画圆
-function drawCircle(context, centerX, centerY, radius) {
-    context.beginPath();
-    context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-    context.stroke();
+/**
+ * 画圆
+ * @param ctx   画布
+ * @param centerX   圆心X坐标
+ * @param centerY   圆心Y坐标
+ * @param radius    半径
+ */
+function drawCircle(ctx, centerX, centerY, radius) {
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.stroke();
 }
 
-//在圆上画点,并将这些点放到数组中
-function drawDotInCircle(context, centerX, centerY, n, dotRadius, array) {
-    var dotX;
-    var dotY;
+/**
+ * 在圆上画点,并将这些点放到数组中
+ * @param ctx
+ * @param centerX   圆心X坐标
+ * @param centerY   圆心Y坐标
+ * @param n    点的数量
+ * @param dotRadius 点的半径
+ */
+function drawDotInCircle(ctx, centerX, centerY, n, dotRadius) {
+    let dotX;
+    let dotY;
     //半径为3
-    for (var i = 0; i < n; i++) {
+    for (let i = 0; i < n; i++) {
         dotX = centerX + radius * Math.sin(Math.PI / n * (i + 1) * 2);
         dotY = centerY - radius * Math.cos(Math.PI / n * (i + 1) * 2);
-        context.beginPath();
-        context.arc(dotX, dotY, dotRadius, 0, 2 * Math.PI);
-        context.fill();
-        var point = {
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, dotRadius, 0, 2 * Math.PI);
+        ctx.fill();
+        let point = {
             x: dotX,
             y: dotY
         };
-        array.push(point);
+        pointArray.push(point);
     }
 }
 
@@ -99,69 +137,6 @@ function gridProcess() {
     document.getElementById("splitNumber").innerText = "切割为" + progressValue + " X " + progressValue + "的栅格(" + progressValue * progressValue + ")";
     //根据滑动条的百分比获取对应的图片长度
     photoSplit2Grid(progressValue);
-}
-
-//控制栅格大小
-function updateProgress(step) {
-    step = this.step;
-
-    var greyImg = document.getElementById("greyImg");
-    // 创建一个Canvas元素
-    var canvas = document.createElement('canvas');
-    canvas.width = greyImg.width;
-    canvas.height = greyImg.height;
-    // 在Canvas上绘制图片
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(greyImg, 0, 0, greyImg.width, greyImg.height);
-    imgWidth = greyImg.width;
-    // 获取图像数据
-    var imageData = ctx.getImageData(0, 0, greyImg.width, greyImg.height);
-    var data = imageData.data;
-    //数据处理
-    for (var y = 0; y < canvas.height; y += step) {
-        for (var x = 0; x < canvas.width; x += step) {
-            var r = 0,
-                g = 0,
-                b = 0,
-                a = 0;
-            for (var offsetY = 0; offsetY < step; offsetY++) {
-                for (var offsetX = 0; offsetX < step; offsetX++) {
-                    var pixelIndex = ((y + offsetY) * canvas.width + (x + offsetX)) * 4;
-
-                    r += data[pixelIndex];
-                    g += data[pixelIndex + 1];
-                    b += data[pixelIndex + 2];
-                    a += data[pixelIndex + 3];
-                }
-            }
-            var blockSize = step * step;
-            r = Math.round(r / blockSize);
-            g = Math.round(g / blockSize);
-            b = Math.round(b / blockSize);
-            a = Math.round(a / blockSize);
-
-            for (var offsetY = 0; offsetY < step; offsetY++) {
-                for (var offsetX = 0; offsetX < step; offsetX++) {
-                    var pixelIndex = ((y + offsetY) * canvas.width + (x + offsetX)) * 4;
-
-                    data[pixelIndex] = r;
-                    data[pixelIndex + 1] = g;
-                    data[pixelIndex + 2] = b;
-                    data[pixelIndex + 3] = a;
-                }
-            }
-        }
-    }
-    // 将处理后的图像数据重新放回Canvas
-    ctx.putImageData(imageData, 0, 0);
-    // 将处理后的Canvas转换为Data URL并显示在页面上
-    var gridScaleImg = new Image();
-    gridScaleImg.src = canvas.toDataURL();
-    gridScaleImg.id = "gridImg";
-    // 在页面上显示灰度处理后的图片
-    var gridProcessDiv = document.getElementById('gridProcessDiv');
-    gridProcessDiv.innerHTML = '';
-    gridProcessDiv.appendChild(gridScaleImg);
 }
 
 /**
@@ -271,5 +246,43 @@ function showPicture(divName,id,canvas){
     greyProcessDiv.innerHTML = '';
     greyProcessDiv.appendChild(img);
 }
+
+/**
+ * 初始化画布,把图片放到左侧的画布中，右侧的画布绘制圆点
+ */
+function initCanvas(){
+    let grayImg = document.getElementById("gridImg");
+    //获取画布
+    let canvas=getCanvas(grayImg);
+    showPicture('left','gridImg',canvas);
+    //在圆上均等画上100个点，每个点的半径为3
+    //点的所需参数
+    let dotSize=document.getElementById("dotSize").value;
+    //画圆
+    let rightCanvas = document.getElementById('rightCanvas');
+    // 在Canvas上绘制图片
+    let ctx = rightCanvas.getContext('2d');
+    //获取当前rightCanvas画布中心的绝对坐标
+    let position = getCanvasCenterAbsolutePosition(rightCanvas);
+    // drawCircle(ctx,position.x,position.y,radius);
+    // drawCircle(ctx,300,400,200);
+    //画点
+    // drawDotInCircle(ctx,position.x,position.y,dotSize,dotRadius);
+}
+
+/**
+ * 获取画布中心的绝对坐标
+ * @param canvas    画布
+ * @returns {{x: number, y: number}}
+ */
+function getCanvasCenterAbsolutePosition(canvas) {
+    // 获取canvas元素的位置信息
+    let rect = canvas.getBoundingClientRect();
+    // 计算canvas中心点相对于视窗的位置
+    let centerX = rect.left + (canvas.width / 2);
+    let centerY = rect.top + (canvas.height / 2);
+    return { x: centerX, y: centerY };
+}
+
 
 

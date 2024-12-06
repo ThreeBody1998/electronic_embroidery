@@ -33,14 +33,27 @@ body {
 }
 
 .second-row {
-    margin-top: 20px;
-    width: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column; /* 子元素垂直排列 */
+    border: 1px solid black;
+    padding: 20px; /* 添加内边距，防止内容与边框重合 */
+}
+
+.comparison-area {
+    margin-bottom: 20px; /* 添加底部间距以避免与下方的canvas重叠 */
+}
+
+.canvas-container {
+    display: flex;
+    gap: 20px; /* 设置两个canvas之间的间距 */
 }
 
 #canvas {
     width: 80%;
     border: 1px solid black;
+}
+.canvasDiv{
+    width:400px;'
+    height:400px;
+    border: 1px solid #ccc;
 }

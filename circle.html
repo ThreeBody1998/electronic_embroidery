@@ -31,7 +31,7 @@
         </div>
         <div class="button-group">
             <h3>栅格化处理区域</h3>
-            每行格子的数量<input type="text" value="10" id="gridNumber">
+            每行格子的数量<input type="text" value="50" id="gridNumber">
             <button onclick="gridProcess()">栅格化处理</button>
             <br>
             <span id="splitNumber"></span>
@@ -40,33 +40,24 @@
         </div>
     </div>
     <div class="second-row">
-        <canvas id="canvas" width="800" height="400"></canvas>
+        <div class="comparison-area">
+            <span>对比区域</span>
+            圆上的点数<input type="text" value="100" id="dotSize"/>
+            <button onclick="initCanvas()">初始化</button>
+            <button onclick="">遗传算法开始模拟</button>
+        </div>
+        <div class="canvas-container">
+            <div id="left" class="canvasDiv">
+
+            </div>
+            <canvas id="rightCanvas" class="canvasDiv">
+
+            </canvas>
+        </div>
     </div>
-    <canvas id="myCanvas" width="800" height="800"></canvas>
-    
-    
     <script>
-        //初始化
-        const canvas = document.getElementById('myCanvas');
-        const context = canvas.getContext('2d');
-        var array=new Array;
         //监听文件提交
         listenImgUpload();
-
-        //圆的参数
-        var centerX = 300;
-        var centerY = 300;
-        var radius = 200;
-        //调用绘制函数
-        drawCircle(context,centerX,centerY,radius);
-        //在圆上均等画上100个点，每个点的半径为3
-        //点的所需参数
-        var dotSize=100;
-        var dotRadius=3;
-        //调用画点函数
-        drawDotInCircle(context,centerX,centerY,dotSize,dotRadius,array);
-        //连接圆上的线
-        drawLine(context,0,50);
     </script>
 
 </body>
