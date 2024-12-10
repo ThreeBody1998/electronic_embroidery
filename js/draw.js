@@ -7,16 +7,6 @@ let gridImg;
 //图片数据
 let imageData;
 /**
- * 点的X坐标
- * @type {number}
- */
-let centerX;
-/**
- * 点的Y坐标
- * @type {number}
- */
-let centerY;
-/**
  * 半径
  * @type {number}
  */
@@ -31,6 +21,14 @@ const dotRadius=3;
  * @type {*[]}
  */
 let pointArray = [];
+//灰度矩阵
+let grayArray = [];
+//计数器
+let counter = 0;
+//每行栅格化的数量
+let gridNumber = 0;
+//每个方格占的像素大小
+let rectWidth = 0;
 
 /**
  * 画圆
@@ -68,17 +66,10 @@ function drawDotInCircle(ctx, centerX, centerY, n, dotRadius) {
             y: dotY
         };
         pointArray.push(point);
+        localStorage.setItem("pointArray", JSON.stringify(pointArray));
     }
 }
 
-//画线
-function drawLine(context, startIndex, endIndex) {
-    context.beginPath();
-    context.moveTo(array[startIndex].x, array[startIndex].y); // 起始点坐标
-    context.lineTo(array[endIndex].x, array[endIndex].y); // 结束点坐标
-    context.strokeStyle = 'black'; // 线条颜色
-    context.stroke(); // 绘制线条
-}
 
 //监听
 function listenImgUpload() {
@@ -133,10 +124,10 @@ function greyProcess() {
  */
 function gridProcess() {
     //读取格子数量
-    var progressValue = document.getElementById("gridNumber").value;
-    document.getElementById("splitNumber").innerText = "切割为" + progressValue + " X " + progressValue + "的栅格(" + progressValue * progressValue + ")";
+    gridNumber = document.getElementById("gridNumber").value;
+    document.getElementById("splitNumber").innerText = "切割为" + gridNumber + " X " + gridNumber + "的栅格(" + gridNumber * gridNumber + ")";
     //根据滑动条的百分比获取对应的图片长度
-    photoSplit2Grid(progressValue);
+    photoSplit2Grid(gridNumber);
 }
 
 /**
@@ -159,8 +150,7 @@ function photoSplit2Grid(number) {
         //计算每个方块的平均像素值
         avgPixelValue(indexArray,imgArrayData);
     }
-    //反显图像
-    showPicture('gridProcessDiv','gridImg',canvas);
+    showArray('gridProcessDiv','gridImg',canvas)
 }
 
 /**
@@ -195,20 +185,37 @@ function avgPixelValue(indexArray,data){
     let r=0;
     let g=0;
     let b=0;
+    let alpha=0;
     for(const element of indexArray) {
         r += data[element];
         g += data[element + 1];
         b += data[element+2];
+        alpha+=data[element+3];
     }
     let number=indexArray.length;
     r = r/number;
     g = g/number;
     b = b/number;
+    alpha=alpha/number;
     for(const element of indexArray) {
         data[element] = r;
         data[element + 1] = g;
         data[element+2]=b;
+        data[element+3]=alpha;
     }
+    let rowNumber=document.getElementById("gridNumber").value;
+    //单个方块的宽度
+    let rectWidth=imgWidth/rowNumber;
+    grayArray.push({
+        index:counter,
+        startX:counter%rowNumber*rectWidth,
+        startY:Math.floor(counter/rowNumber)*rectWidth,
+        r:r,
+        g:g,
+        b:b,
+        alpha:alpha
+    })
+    counter++;
 }
 
 /**
@@ -242,32 +249,30 @@ function showPicture(divName,id,canvas){
     img.src = canvas.toDataURL();
     img.id = id;
     // 在页面上显示灰度处理后的图片
-    let greyProcessDiv = document.getElementById(divName);
-    greyProcessDiv.innerHTML = '';
-    greyProcessDiv.appendChild(img);
+    let div = document.getElementById(divName);
+    div.innerHTML = '';
+    div.appendChild(img);
 }
 
 /**
- * 初始化画布,把图片放到左侧的画布中，右侧的画布绘制圆点
+ * 初始化画布,在最左侧的画布上画圆
  */
 function initCanvas(){
-    let grayImg = document.getElementById("gridImg");
-    //获取画布
-    let canvas=getCanvas(grayImg);
-    showPicture('left','gridImg',canvas);
-    //在圆上均等画上100个点，每个点的半径为3
-    //点的所需参数
-    let dotSize=document.getElementById("dotSize").value;
     //画圆
-    let rightCanvas = document.getElementById('rightCanvas');
-    // 在Canvas上绘制图片
-    let ctx = rightCanvas.getContext('2d');
+    let leftCanvas=document.createElement('canvas');
+    leftCanvas.width=imgWidth;
+    leftCanvas.height=imgWidth;
+    leftCanvas.id='leftCanvas';
+    let ctx=leftCanvas.getContext('2d');
     //获取当前rightCanvas画布中心的绝对坐标
-    let position = getCanvasCenterAbsolutePosition(rightCanvas);
-    // drawCircle(ctx,position.x,position.y,radius);
-    // drawCircle(ctx,300,400,200);
+    let position = getCanvasCenterAbsolutePosition(leftCanvas);
+    drawCircle(ctx,position.x,position.y,radius);
     //画点
-    // drawDotInCircle(ctx,position.x,position.y,dotSize,dotRadius);
+    let dotSize=document.getElementById("dotSize").value;
+    drawDotInCircle(ctx,position.x,position.y,dotSize,dotRadius);
+    let leftDiv = document.getElementById('leftDiv');
+    leftDiv.innerHTML = '';
+    leftDiv.appendChild(leftCanvas);
 }
 
 /**
@@ -283,6 +288,27 @@ function getCanvasCenterAbsolutePosition(canvas) {
     let centerY = rect.top + (canvas.height / 2);
     return { x: centerX, y: centerY };
 }
+
+/**
+ * 根据灰度矩阵画方块
+ * @param divName   显示的div的id
+ * @param id    图片的id
+ * @param canvas    画布
+ */
+function  showArray(divName,id,canvas){
+    // 画方块
+    let ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    rectWidth=imgWidth/gridNumber;
+    for(const element of grayArray){
+        ctx.fillStyle = 'rgba('+element.r+','+element.g+','+element.b+','+element.alpha+')';
+        ctx.fillRect(element.startX,element.startY,rectWidth,rectWidth);
+    }
+    let div = document.getElementById(divName);
+    div.innerHTML = '';
+    div.appendChild(canvas);
+}
+
 
 
 
