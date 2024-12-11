@@ -57,3 +57,25 @@ body {
     height:400px;
     border: 1px solid #ccc;
 }
+canvasShow {
+    display: flex;
+    flex-direction: column; /* 子元素垂直排列 */
+    align-items: flex-start; /* 对齐到左侧 */
+}
+
+.controls {
+    display: flex; /* 使子元素水平排列 */
+    flex-wrap: wrap; /* 允许子元素换行 */
+    align-items: center; /* 垂直居中对齐 */
+    gap: 8px; /* 控件之间的间距 */
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    white-space: nowrap; /* 防止文本和输入框分开 */
+}
+
+.control-group > * {
+    margin-right: 4px; /* 调整内部间距 */
+}

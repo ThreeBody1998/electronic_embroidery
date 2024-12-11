@@ -273,6 +273,23 @@ function initCanvas(){
     let leftDiv = document.getElementById('leftDiv');
     leftDiv.innerHTML = '';
     leftDiv.appendChild(leftCanvas);
+
+    let centerCanvas = document.createElement("canvas");
+    centerCanvas.width = imgWidth;
+    centerCanvas.height = imgWidth;
+    centerCanvas.id = "centerCanvas";
+    let centerDiv = document.getElementById("centerDiv");
+    centerDiv.innerHTML = "";
+    centerDiv.appendChild(centerCanvas);
+
+    let rightCanvas = document.createElement("canvas");
+    rightCanvas.width = imgWidth;
+    rightCanvas.height = imgWidth;
+    rightCanvas.id = "rightCanvas";
+    let rightDiv = document.getElementById("rightDiv");
+    rightDiv.innerHTML = "";
+    rightDiv.appendChild(rightCanvas);
+
 }
 
 /**

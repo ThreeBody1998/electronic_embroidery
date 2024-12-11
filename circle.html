@@ -15,49 +15,70 @@
     <link rel="stylesheet" href="css/draw.css">
 </head>
 <body>
-    <div class="first-row">
-        <div class="button-group file-upload">
-            <h3>文件上传区域</h3>
-            <div>
-                <input type="file" id="fileInput">
-            </div>
-            <img id="preview" style="width: 400px;height: 400px;"/>
+<div class="first-row">
+    <div class="button-group file-upload">
+        <h3>文件上传区域</h3>
+        <div>
+            <input type="file" id="fileInput">
         </div>
-        <div class="button-group">
-            <h3>灰度处理区域</h3>
-            <button onclick="greyProcess()">灰度处理</button>
-            <div id="greyProcessDiv">
+        <img id="preview" style="width: 400px;height: 400px;"/>
+    </div>
+    <div class="button-group">
+        <h3>灰度处理区域</h3>
+        <button onclick="greyProcess()">灰度处理</button>
+        <div id="greyProcessDiv">
+
+        </div>
+    </div>
+    <div class="button-group">
+        <h3>栅格化处理区域</h3>
+        每行格子的数量<input type="text" value="50" id="gridNumber">
+        <button onclick="gridProcess()">栅格化处理</button>
+        <br>
+        <span id="splitNumber"></span>
+        <div id="gridProcessDiv">
+        </div>
+    </div>
+</div>
+<div class="second-row">
+    <div class="comparison-area">
+        <span>遗传算法</span>
+
+
+    </div>
+    <div class="canvas-container">
+        <div class="canvasShow">
+            <div class="controls">
+                圆上的点数<label for="dotSize"></label><input type="text" value="100" id="dotSize"/>
+                <button onclick="initCanvas()">初始化</button>
+            </div>
+            <div id="leftDiv" class="canvasDiv">
 
             </div>
         </div>
-        <div class="button-group">
-            <h3>栅格化处理区域</h3>
-            每行格子的数量<input type="text" value="50" id="gridNumber">
-            <button onclick="gridProcess()">栅格化处理</button>
-            <br>
-            <span id="splitNumber"></span>
-            <div id="gridProcessDiv">
+        <div class="canvasShow">
+            <div class="controls">
+                线条的数量<label for="randomLineNumber"></label><input type="text" value="1000" id="randomLineNumber">
+                <button onclick="randomDrawLine()">随机连线</button>
+            </div>
+            <div id="centerDiv" class="canvasDiv">
+
             </div>
         </div>
-    </div>
-    <div class="second-row">
-        <div class="comparison-area">
-            <span>遗传算法</span>
-            圆上的点数<input type="text" value="100" id="dotSize"/>
-            <button onclick="initCanvas()">初始化</button>
-            <button onclick="randomDrawLine()">随机连线</button>
-            <input type="text" value="1000" id="randomLineNumber">
-        </div>
-        <div class="canvas-container">
-            <div id="leftDiv" class="canvasDiv"></div>
-            <div id="centerDiv" class="canvasDiv"></div>
+        <div class="canvasShow">
+            <div class="controls">
+                <div class="control-group">
+                    <button onclick="algorithm()">算法</button>
+                </div>
+            </div>
             <div id="rightDiv" class="canvasDiv"></div>
         </div>
     </div>
-    <script>
-        //监听文件提交
-        listenImgUpload();
-    </script>
+</div>
+<script>
+    //监听文件提交
+    listenImgUpload();
+</script>
 
 </body>
 </html>
