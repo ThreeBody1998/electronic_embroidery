@@ -66,7 +66,6 @@ function drawDotInCircle(ctx, centerX, centerY, n, dotRadius) {
             y: dotY
         };
         pointArray.push(point);
-        localStorage.setItem("pointArray", JSON.stringify(pointArray));
     }
 }
 
@@ -150,6 +149,11 @@ function photoSplit2Grid(number) {
         //计算每个方块的平均像素值
         avgPixelValue(indexArray,imgArrayData);
     }
+    grayArray.forEach(function (item) {
+        if(item.alpha!==255){
+            console.log(item.alpha);
+        }
+    });
     showArray('gridProcessDiv','gridImg',canvas)
 }
 
@@ -289,7 +293,13 @@ function initCanvas(){
     let rightDiv = document.getElementById("rightDiv");
     rightDiv.innerHTML = "";
     rightDiv.appendChild(rightCanvas);
-
+    pointXArray = pointArray.map(function (item) {
+        return item.x;
+    });
+    pointYArray = pointArray.map(function (item) {
+        return item.y;
+    });
+    rectColorMap.clear();
 }
 
 /**

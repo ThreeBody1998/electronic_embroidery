@@ -68,7 +68,11 @@
         <div class="canvasShow">
             <div class="controls">
                 <div class="control-group">
-                    <button onclick="algorithm()">算法</button>
+                    交叉率<label for="crossRate"></label><input type="text" value="0.5" id="crossRate"/>
+                    变异率<label for="mutationRate"></label><input type="text" value="0.01" id="mutationRate"/>
+                    迭代次数<label for="iterationNumber"></label><input type="text" value="100" id="iterationNumber"/>
+                    种群数量<label for="populationNumber"></label><input type="text" value="1000" id="populationNumber"/>
+                    <button onclick="geneticAlgorithm()">算法</button>
                 </div>
             </div>
             <div id="rightDiv" class="canvasDiv"></div>
